@@ -1,5 +1,6 @@
 import socket
-import multiprocessing
+from pathos.multiprocessing import ProcessingPool as Pool
+from multiprocessing import Manager
 
 class PortScannerFactory:
     """Factory for creating port scanner instances based on the scan type."""
@@ -19,12 +20,12 @@ class PortScannerFactory:
             "UDP": UDPScanner(),
             "ICMP": ICMPScanner(),
             "SCTP": SCTPScanner(),
-
         }
         return port_scanners[port_type]
 
 class PortScannerBase:
     """Base class for port scanners."""
+    
     def scan_port(self, target_ip, port, result):
         """Scan a specific port on the target IP address and update the result.
 
@@ -36,12 +37,11 @@ class PortScannerBase:
         pass
 
     def scan_target(self, target, ports):
-        """Scan a range of ports on the target host.
+        """Scan a range of ports on the target host using multiprocessing.
 
         Args:
             target (str): The hostname or IP address of the target host.
             ports (range): The range of ports to scan.
-            scan_type (str): The type of scan to perform (default is "TCP").
 
         Returns:
             dict: A dictionary of open and closed ports.
@@ -55,25 +55,24 @@ class PortScannerBase:
             print(f"Error: Could not resolve {target}")
             return open_ports, closed_ports
 
-        processes = []
-        manager = multiprocessing.Manager()
-        result = manager.dict()
+        with Pool() as pool:  
+            manager = Manager()
+            result = manager.dict()
 
-        for port in ports:
-            port = int(port)
-            process = multiprocessing.Process(target=self.scan_port, args=(target_ip, port, result))
-            processes.append(process)
-            process.start()
+            def scan_single_port(port):
+                """Scan a single port on the target IP address.
 
-        for process in processes:
-            process.join()
+                Args:
+                    port (int): The port to scan.
+                """
+                status = self.scan_port(target_ip, port, result)
+                if status == "open":
+                    open_ports[port] = status
+                else:
+                    closed_ports[port] = status
 
-        for port, status in result.items():
-            if status == "open":
-                open_ports[port] = status
-            else:
-                closed_ports[port] = status
-        
+            pool.map(scan_single_port, ports)
+
         return open_ports, closed_ports
 
 class TCPScanner(PortScannerBase):
@@ -90,11 +89,11 @@ class TCPScanner(PortScannerBase):
         tcp_sock.settimeout(1)
 
         try:
-            tcp_sock.connect((target_ip,port))
+            tcp_sock.connect((target_ip, port))
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
-        
+
         tcp_sock.close()
 
 class UDPScanner(PortScannerBase):
@@ -135,7 +134,7 @@ class ICMPScanner(PortScannerBase):
             icmp_sock.sendto(packet, (target_ip, port))
             recv_data, addr = icmp_sock.recvfrom(1024)
             result[port] = "open"
-        except ( socket.timeout, ConnectionRefusedError):
+        except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
 
         icmp_sock.close()
@@ -158,7 +157,5 @@ class SCTPScanner(PortScannerBase):
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
-        
+
         sctp_sock.close()
-
-

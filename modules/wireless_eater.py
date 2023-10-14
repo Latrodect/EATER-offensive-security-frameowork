@@ -22,27 +22,7 @@ This script is intended for educational and testing purposes only. Unauthorized 
 from abc import ABC, abstractmethod
 from subprocess import run
 
-class WirelessEaterFactory:
-    """
-    Wireless Factory Class
-    """
-    def generate_wireless_factory(cracker_type):
-        """Factory for creating wireless network password cracker instances.
-
-        Args:
-            cracker_type (str): The type of wireless password cracker to create (e.g., "wep", "wpa", "wpa2").
-
-        Returns:
-            WirelessEaterBase: An instance of the selected wireless password cracker.
-        """
-        cracker_class = {
-            "wep": WEPCracker(),
-            "wpa": WPACracker(),
-            "wpa2": WPA2Cracker()
-        }
-        return cracker_class[cracker_type]
-
-class WirelessEaterBase():
+class WirelessEaterBase(ABC):
     """
     Wireless Eater Base Abstact Class
     """
@@ -158,3 +138,31 @@ class WPA2Cracker(WirelessEaterBase):
                     print(f"Eater fund password: {password}")
         except Exception as e:
             print(f"An error occured: {e}")
+
+class WirelessEaterFactory:
+    """
+    Wireless Factory Class
+    """
+    cracker_classes = {
+        "wep": WEPCracker,
+        "wpa": WPACracker,
+        "wpa2": WPA2Cracker
+    }
+
+    @staticmethod
+    def generate_wireless_factory(cracker_type):
+        """Factory for creating wireless network password cracker instances.
+
+        Args:
+            cracker_type (str): The type of wireless password cracker to create (e.g., "wep", "wpa", "wpa2").
+
+        Returns:
+            WirelessEaterBase: An instance of the selected wireless password cracker or None if the type is unrecognized.
+        """
+        cracker_type = cracker_type.lower()
+        cracker_class = WirelessEaterFactory.cracker_classes.get(cracker_type)
+        if cracker_class:
+            cracker_instance = cracker_class()
+            return cracker_instance
+        else:
+            raise ValueError(f"Cracker type '{cracker_type}' is not recognized.")

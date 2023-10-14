@@ -32,12 +32,6 @@ class ModuleBase(ABC):
     """
     Abstract base class for modules.
     """
-    
-    def __init__(self):
-        """
-        Initializes the module.
-        """
-        self.run()
 
     @abstractmethod
     def run(self):
@@ -110,9 +104,9 @@ class ModuleFactory:
     Factory class for generating modules.
     """
     module_classes = {
-        "protosearch": ProtosearchModule,
-        "bannergrabber": BannergrabberModule,
-        "wireless-eater": WirelessEaterModule,
+        "protosearch": ProtosearchModule(),
+        "bannergrabber": BannergrabberModule(),
+        "wireless-eater": WirelessEaterModule(),
     }
 
     @staticmethod
@@ -126,9 +120,10 @@ class ModuleFactory:
         Returns:
             ModuleBase: An instance of the specified module.
         """
-        module_class = ModuleFactory.module_classes.get(module_type)
-        if module_class:
-            return module_class()
-        else:
-            print(f"Module type '{module_type}' is not recognized.")
-            return None
+        if module_type in ModuleFactory.module_classes:
+            module_instance = ModuleFactory.module_classes.get(module_type)
+            if module_instance:
+                return module_instance
+            else:
+                print(f"Module type '{module_type}' is not recognized.")
+                return None

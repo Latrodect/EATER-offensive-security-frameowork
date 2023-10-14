@@ -21,24 +21,6 @@ This module is intended for network diagnostics and information gathering. Unaut
 
 import socket
 from abc import ABC, abstractmethod
-class BannerGrabberFactory:
-    def generate_banner_grabber(banner_type):
-        """
-        Factory method to generate an instance of a banner grabber.
-
-        Args:
-            banner_type (str): Type of the banner grabber (e.g., "tcp", "udp", "icmp", "sctp").
-
-        Returns:
-            BannerGrabberBase: An instance of the specified banner grabber class.
-        """
-        banner_classes = {
-            "tcp": TCPBannerGrabber(),
-            "udp": UDPBannerGrabber(),
-            "icmp": ICMPBannerGrabber(),
-            "sctp": SCTPBannerGrabber()
-        }
-        return banner_classes[banner_type]
         
 class BannerGrabberBase(ABC):
     """"
@@ -57,7 +39,6 @@ class BannerGrabberBase(ABC):
         general exceptions, providing error messages in case of issues.
         """
         pass
-
 
 class TCPBannerGrabber(BannerGrabberBase):
     """
@@ -179,4 +160,31 @@ class SCTPBannerGrabber(BannerGrabberBase):
         finally:
             sctp_socket.close()
             
-        
+class BannerGrabberFactory:
+    """ Banner Grabber Factory Class"""
+    banner_classes = {
+            "tcp": TCPBannerGrabber(),
+            "udp": UDPBannerGrabber(),
+            "icmp": ICMPBannerGrabber(),
+            "sctp": SCTPBannerGrabber()
+        }
+
+    @staticmethod
+    def generate_banner_grabber(banner_type):
+        """
+        Factory method to generate an instance of a banner grabber.
+
+        Args:
+            banner_type (str): Type of the banner grabber (e.g., "tcp", "udp", "icmp", "sctp").
+
+        Returns:
+            BannerGrabberBase: An instance of the specified banner grabber class.
+        """
+        banner_type = banner_type.lower()
+        banner_class = BannerGrabberFactory.banner_classes.get(banner_type)
+        if banner_class:
+            scanner_instance = banner_class()
+            return scanner_instance
+        else:
+            raise ValueError(f"Cracker type '{banner_type}' is not recognized.")
+            

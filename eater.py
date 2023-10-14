@@ -38,7 +38,7 @@ class EaterCLI(cmd.Cmd):
         Args:
             module_name (str): The name of the module to use.
         """
-        activate_module = ModuleFactory[module_name]
+        activate_module = ModuleFactory.generate_module(module_name)
         print(f"Module activated: {activate_module}")
 
     def do_show(self, arg):

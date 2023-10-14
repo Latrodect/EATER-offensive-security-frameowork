@@ -28,34 +28,6 @@ from modules.port_scanner import PortScannerFactory
 from modules.banner_grabber import BannerGrabberFactory
 from modules.wireless_eater import WirelessEaterFactory
 
-class ModuleFactory:
-    """
-    Factory class for generating modules.
-    """
-    
-    @staticmethod
-    def generate_module(module_type):
-        """
-        Factory method to generate a module instance based on the provided module_type.
-
-        Args:
-            module_type (str): The type of module to create ("protosearch" or "bannergrabber").
-
-        Returns:
-            ModuleBase: An instance of the specified module.
-        """
-        modules = {
-            "protosearch": ProtosearchModule(),
-            "bannergrabber": BannergrabberModule(),
-            "wireless_eater": WirelessEaterModule()
-        }
-
-        if module_type in modules:
-            return modules[module_type]
-        else:
-            print(f"Module type '{module_type}' is not recognized.")
-            return None
-
 class ModuleBase(ABC):
     """
     Abstract base class for modules.
@@ -132,3 +104,31 @@ class WirelessEaterModule(ModuleBase):
         wireless_eater = WirelessEaterFactory.generate_wireless_factory(network_type)
         wireless_eater.crack(dictionary_path)
         print(f"Performing password cracking with dictionary: {dictionary_path}, network type: {network_type}...")
+
+class ModuleFactory:
+    """
+    Factory class for generating modules.
+    """
+    module_classes = {
+        "protosearch": ProtosearchModule,
+        "bannergrabber": BannergrabberModule,
+        "wireless-eater": WirelessEaterModule,
+    }
+
+    @staticmethod
+    def generate_module(module_type):
+        """
+        Factory method to generate a module instance based on the provided module_type.
+
+        Args:
+            module_type (str): The type of module to create ("protosearch" or "bannergrabber" or "wireless-eater").
+
+        Returns:
+            ModuleBase: An instance of the specified module.
+        """
+        module_class = ModuleFactory.module_classes.get(module_type)
+        if module_class:
+            return module_class()
+        else:
+            print(f"Module type '{module_type}' is not recognized.")
+            return None

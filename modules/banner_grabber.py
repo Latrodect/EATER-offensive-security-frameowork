@@ -1,3 +1,24 @@
+"""
+Banner Grabber
+
+This module provides classes for grabbing banners from remote services running on specified target hosts using various network protocols, including TCP, UDP, ICMP (Ping), and SCTP. The BannerGrabberFactory allows the creation of specific banner grabber instances based on the selected banner type. Each banner grabber class is responsible for grabbing banners from services and provides methods for this purpose.
+
+Classes:
+- BannerGrabberFactory: Factory for creating banner grabber instances based on the banner type.
+- BannerGrabberBase: Abstract base class for banner grabbers.
+- TCPBannerGrabber: Banner grabber for TCP ports.
+- UDPBannerGrabber: Banner grabber for UDP ports.
+- ICMPBannerGrabber: Banner grabber for ICMP Echo Request (Ping).
+- SCTPBannerGrabber: Banner grabber for SCTP ports.
+
+Usage:
+1. Choose the type of banner grabber (e.g., "tcp", "udp", "icmp", "sctp").
+2. Specify the target hostname or IP address and the port from which to grab the banner.
+3. Execute the banner grabber to attempt to retrieve the service banner from the specified target.
+
+This module is intended for network diagnostics and information gathering. Unauthorized use may violate laws and regulations.
+"""
+
 import socket
 from abc import ABC, abstractmethod
 class BannerGrabberFactory:
@@ -157,8 +178,5 @@ class SCTPBannerGrabber(BannerGrabberBase):
             print(f"An error occured {target}:{port}")
         finally:
             sctp_socket.close()
-
-
-
             
         

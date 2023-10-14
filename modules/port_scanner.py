@@ -23,31 +23,12 @@ This module is intended for network diagnostics and security testing purposes. U
 import socket
 from pathos.multiprocessing import ProcessingPool as Pool
 from multiprocessing import Manager
+from abc import ABC, abstractmethod
 
-class PortScannerFactory:
-    """Factory for creating port scanner instances based on the scan type."""
-
-    @staticmethod
-    def generate_port_scanner(port_type):
-        """Generate a port scanner instance based on the provided port type.
-
-        Args:
-            port_type (str): The type of port scanner to create (e.g., "TCP", "UDP", "ICMP", "SCTP").
-
-        Returns:
-            PortScannerBase: An instance of the specified port scanner.
-        """
-        port_scanners = {
-            "TCP": TCPScanner(),
-            "UDP": UDPScanner(),
-            "ICMP": ICMPScanner(),
-            "SCTP": SCTPScanner(),
-        }
-        return port_scanners[port_type]
-
-class PortScannerBase:
+class PortScannerBase(ABC):
     """Base class for port scanners."""
     
+    @abstractmethod
     def scan_port(self, target_ip, port, result):
         """Scan a specific port on the target IP address and update the result.
 
@@ -183,3 +164,30 @@ class SCTPScanner(PortScannerBase):
             result[port] = "closed"
         finally:
             sctp_sock.close()
+
+class PortScannerFactory:
+    """Factory for creating port scanner instances based on the scan type."""
+    scanner_classes = {
+            "TCP": TCPScanner(),
+            "UDP": UDPScanner(),
+            "ICMP": ICMPScanner(),
+            "SCTP": SCTPScanner(),
+        }
+
+    @staticmethod
+    def generate_port_scanner(port_type):
+        """Generate a port scanner instance based on the provided port type.
+
+        Args:
+            port_type (str): The type of port scanner to create (e.g., "TCP", "UDP", "ICMP", "SCTP").
+
+        Returns:
+            PortScannerBase: An instance of the specified port scanner.
+        """
+        port_type = port_type.lower()
+        scanner_class = PortScannerFactory.scanner_classes.get(port_type)
+        if scanner_class:
+            scanner_instance = scanner_class()
+            return scanner_instance
+        else:
+            raise ValueError(f"Cracker type '{port_type}' is not recognized.")

@@ -24,13 +24,15 @@ init(strip=not sys.stdout.isatty())
 from termcolor import cprint 
 from pyfiglet import figlet_format
 from utils.module_generator import ModuleFactory
+from termcolor import colored
 
 class EaterCLI(cmd.Cmd):
     ascii_art = figlet_format('EATER', font="isometric1")
-    intro = cprint(ascii_art, 'yellow', attrs=['bold'])
+    intro = cprint(ascii_art, 'green', attrs=['bold'])
     desc_head = cprint('Introduction:', 'green', attrs=['bold'])
     desc_cont = cprint('Welcome to Eater - The Network Utility Tool\nType `help` to see available commands.' , 'white', attrs=['bold'])
     prompt="Command: "
+    activated_module = None
 
     def do_use(self, module_name):
         """Use a specific module.
@@ -38,8 +40,47 @@ class EaterCLI(cmd.Cmd):
         Args:
             module_name (str): The name of the module to use.
         """
-        activate_module = ModuleFactory.generate_module(module_name)
-        print(f"Module activated: {activate_module}")
+        module_name = module_name.lower()
+        self.activated_module = ModuleFactory.generate_module(module_name)
+        if self.activated_module:
+            text = colored(f"{module_name}", "red")
+            print(f"Module activated: {module_name}")
+            self.prompt = f"({text}) Command: "
+        else:
+            print(f"Module '{module_name}' is not recognized.")
+
+
+    def do_exec(self, arg):
+        """Execute the currently activated module.
+
+        Args:
+            arg (str): Any arguments to pass to the activated module.
+        """
+        if self.activated_module:
+            self.activated_module.run()
+        else:
+            print("No module activated. Use 'use <module_name>' to activate a module.")
+
+    def do_cls(self, arg):
+        """Clear activated module.
+
+        Args:
+            arg (str): Any arguments to pass to the activated module.
+        """
+        ascii_art = figlet_format('EATER', font="isometric1")
+        intro = cprint(ascii_art, 'green', attrs=['bold'])
+        desc_head = cprint('Introduction:', 'green', attrs=['bold'])
+        desc_cont = cprint('Welcome to Eater - The Network Utility Tool\nType `help` to see available commands.' , 'white', attrs=['bold'])
+        self.activated_module = None
+        self.prompt = f"\nCommand: "
+
+    def do_act(self, arg):
+        """Execute the currently activated module.
+
+        Args:
+            arg (str): Any arguments to pass to the activated module.
+        """
+        print(f"Activated Module Is: {self.activated_module.__class__.__name__}")
 
     def do_show(self, arg):
         """Show available modules or help for a specific module.

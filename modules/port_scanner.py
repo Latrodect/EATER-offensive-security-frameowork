@@ -183,4 +183,3 @@ class SCTPScanner(PortScannerBase):
             result[port] = "closed"
         finally:
             sctp_sock.close()
-

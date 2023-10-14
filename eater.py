@@ -1,3 +1,22 @@
+"""
+Eater CLI
+
+A command-line interface (CLI) for the Eater Network Utility Tool. The Eater CLI provides an interactive shell for using various network utility modules. Users can activate specific modules, show available modules, and access module help using the provided commands.
+
+Commands:
+- 'use <module_name>': Activate a specific module.
+- 'show [modules | help]': Display available modules or get help for a specific module.
+- 'quit': Exit the Eater CLI.
+
+Usage:
+1. Start the Eater CLI.
+2. Use the 'use' command to activate a specific module (e.g., 'use protosearch').
+3. Use the 'show' command to list available modules or get help (e.g., 'show modules' or 'show help').
+4. Exit the Eater CLI using the 'quit' command.
+
+The Eater CLI is an interactive tool for network utility tasks, providing access to various modules. Unauthorized use may violate laws and regulations.
+"""
+
 import cmd
 import sys
 from colorama import init

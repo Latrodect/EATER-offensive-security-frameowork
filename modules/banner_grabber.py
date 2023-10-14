@@ -178,8 +178,5 @@ class SCTPBannerGrabber(BannerGrabberBase):
             print(f"An error occured {target}:{port}")
         finally:
             sctp_socket.close()
-
-
-
             
         

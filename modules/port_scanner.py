@@ -1,3 +1,25 @@
+"""
+Port Scanner
+
+This module provides classes for scanning and identifying open and closed network ports on a target host using various network protocols, including TCP, UDP, ICMP (Ping), and SCTP. The PortScannerFactory allows the creation of specific port scanner instances based on the selected scan type. Each port scanner class is responsible for scanning a specific type of port and provides methods for conducting the scans.
+
+Classes:
+- PortScannerFactory: Factory for creating port scanner instances based on the scan type.
+- PortScannerBase: Abstract base class for port scanners.
+- TCPScanner: Port scanner for TCP ports.
+- UDPScanner: Port scanner for UDP ports.
+- ICMPScanner: Port scanner for ICMP Echo Request (Ping).
+- SCTPScanner: Port scanner for SCTP ports.
+
+Usage:
+1. Choose the type of port scanner (e.g., "TCP", "UDP", "ICMP", "SCTP").
+2. Specify the target hostname or IP address.
+3. Provide a range of ports to scan.
+4. Execute the port scanner to identify open and closed ports.
+
+This module is intended for network diagnostics and security testing purposes. Unauthorized use may violate laws and regulations.
+"""
+
 import socket
 from pathos.multiprocessing import ProcessingPool as Pool
 from multiprocessing import Manager

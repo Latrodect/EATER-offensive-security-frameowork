@@ -4,7 +4,8 @@ from colorama import init
 init(strip=not sys.stdout.isatty())
 from termcolor import cprint 
 from pyfiglet import figlet_format
-from modules.port_scanner import PortScannerFactory
+from utils.module_generator import ModuleFactory
+
 class EaterCLI(cmd.Cmd):
     ascii_art = figlet_format('EATER', font="isometric1")
     intro = cprint(ascii_art, 'yellow', attrs=['bold'])
@@ -18,18 +19,8 @@ class EaterCLI(cmd.Cmd):
         Args:
             module_name (str): The name of the module to use.
         """
-        if module_name == "protosearch":
-            print("You've selected the 'protosearch' module.")
-            target = input("Enter the target (hostname or IP address): ")
-            port_range = input("Enter the port range (e.g., 80-100): ").strip()
-            scan_type = input("Enter the scan type (TCP/UDP/ICMP/SCTP, default is TCP): ").strip().upper() or "TCP"
-
-            port_scanner = PortScannerFactory.generate_port_scanner(scan_type)
-            port_scanner.scan_target(target, port_range)
-            print(f"Performing port scanning on target: {target} with port range: {port_range} using {scan_type}...")
-
-        else:
-            print(f"Module '{module_name}' not found.")
+        activate_module = ModuleFactory[module_name]
+        print(f"Module activated: {activate_module}")
 
     def do_show(self, arg):
         """Show available modules or help for a specific module.

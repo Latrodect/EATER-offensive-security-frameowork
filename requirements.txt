@@ -1,0 +1,4 @@
+pyfiglet==1.0.2
+colorama==0.4.6
+termcolor==2.3.0
+pathos==0.3.1

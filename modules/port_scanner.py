@@ -93,8 +93,8 @@ class TCPScanner(PortScannerBase):
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
-
-        tcp_sock.close()
+        finally:
+            tcp_sock.close()
 
 class UDPScanner(PortScannerBase):
     """Port scanner for UDP ports."""
@@ -115,6 +115,8 @@ class UDPScanner(PortScannerBase):
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
+        finally:
+            udp_sock.close()
 
 class ICMPScanner(PortScannerBase):
     """Port scanner for ICMP Echo Request (Ping)."""
@@ -136,8 +138,8 @@ class ICMPScanner(PortScannerBase):
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
-
-        icmp_sock.close()
+        finally:
+            icmp_sock.close()
 
 class SCTPScanner(PortScannerBase):
     """Port scanner for SCTP ports."""
@@ -157,5 +159,6 @@ class SCTPScanner(PortScannerBase):
             result[port] = "open"
         except (socket.timeout, ConnectionRefusedError):
             result[port] = "closed"
+        finally:
+            sctp_sock.close()
 
-        sctp_sock.close()

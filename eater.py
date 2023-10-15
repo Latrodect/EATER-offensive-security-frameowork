@@ -90,10 +90,11 @@ class EaterCLI(cmd.Cmd):
         """
         print("\nYou can use modules with 'use' command.")
         if arg == "modules":
-            print("Available modules:")
+            print("Available modules:\n")
             print("1. protosearch - Port scanning module\n")
             print("2. bannergrabber - Banner Grabber module\n")
             print("3. wireless-eater - Wireless Eater module\n")
+            print("4. payload - Generate Payload\n")
         elif arg == "help":
             print("To use a module, type 'use <module_name>'.\n")
             print("To see available modules, type 'show modules'.\n")

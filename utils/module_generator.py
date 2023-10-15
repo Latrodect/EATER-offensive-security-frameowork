@@ -24,10 +24,11 @@ The 'ModuleFactory' creates instances of these modules based on the module_type 
 """
 
 from abc import ABC, abstractmethod
+from termcolor import colored
 from modules.port_scanner import PortScannerFactory
 from modules.banner_grabber import BannerGrabberFactory
 from modules.wireless_eater import WirelessEaterFactory
-
+from modules.payloads import PayloadFactory
 class ModuleBase(ABC):
     """
     Abstract base class for modules.
@@ -99,6 +100,35 @@ class WirelessEaterModule(ModuleBase):
         wireless_eater.crack(dictionary_path)
         print(f"Performing password cracking with dictionary: {dictionary_path}, network type: {network_type}...")
 
+class PayloadModule(ModuleBase):
+    def run(self):
+        """Execute the payload module.
+
+        This method allows the user to select and execute various payload commands. Users can view available payload options or choose a specific payload to run. Supported commands include 'all' to display all available payloads and '-rev-shell' to initiate a reverse shell connection to the target machine.
+        """
+        command_list = ["-all", "-rev-shell", "-rev-tcp"]
+        print(f"You've selected the 'payload' module.\nFor see all payloads -> all")
+        payload_command = input("Payload Command:")
+        payload_command = payload_command.lower()
+        commands = payload_command.split(" ")
+        if len(commands) > 1 and len(commands) < 3:
+            command = commands[1]
+            if command in command_list:
+                if  payload_command == "-all":
+                    for item in command_list:
+                        payload_string = colored(f"{item} : Opens a reverse shell connection to target machine", "yellow")
+                        print(f"{payload_string}")
+                elif "-g" in payload_command:
+                    PayloadFactory.generate_payload_factory(payload_command.split(" ")[1], mode="generate")
+                    print(f"Performing payload: {payload_command}...")
+                else:
+                    PayloadFactory.generate_payload_factory(payload_command)
+                    print(f"Performing payload: {payload_command}...")
+            else:
+                print(f"Unknown command please use 'all' command for show commands.")
+        else:
+            print(f"Too many argument: {payload_command}")
+            
 class ModuleFactory:
     """
     Factory class for generating modules.
@@ -107,6 +137,7 @@ class ModuleFactory:
         "protosearch": ProtosearchModule(),
         "bannergrabber": BannergrabberModule(),
         "wireless-eater": WirelessEaterModule(),
+        "payload": PayloadModule(),
     }
 
     @staticmethod
